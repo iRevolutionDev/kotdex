@@ -11,13 +11,13 @@ class ClientOptions(
     var largeThreshold: Int = 250,
     var policy: MemberCachePolicy = MemberCachePolicy.DEFAULT
 ) {
-    var intents: MutableList<GatewayIntent> = mutableListOf()
-    fun intents(block: MutableList<GatewayIntent>.() -> Unit) {
+    var intents: List<GatewayIntent> = listOf()
+    fun intents(block: List<GatewayIntent>.() -> Unit) {
         intents.apply(block)
     }
 
-    var caches: MutableList<CacheFlag> = mutableListOf()
-    fun caches(block: MutableList<CacheFlag>.() -> Unit) {
+    var caches: List<CacheFlag> = listOf()
+    fun caches(block: List<CacheFlag>.() -> Unit) {
         caches.apply(block)
     }
 }
