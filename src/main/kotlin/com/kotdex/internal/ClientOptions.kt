@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 
-class ClientOptions(
+data class ClientOptions(
     var prefix: String = "!",
     var chunkingFilter: ChunkingFilter = ChunkingFilter.NONE,
     var largeThreshold: Int = 250,
