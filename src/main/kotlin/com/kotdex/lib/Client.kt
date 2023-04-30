@@ -1,4 +1,4 @@
-package com.kotdex
+package com.kotdex.lib
 
 import com.kotdex.internal.ClientOptions
 import net.dv8tion.jda.api.JDABuilder
