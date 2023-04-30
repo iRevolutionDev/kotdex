@@ -1,12 +1,14 @@
 package com.kotdex.lib
 
 import com.kotdex.internal.ClientOptions
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
 
 class Client(options: ClientOptions.() -> Unit) {
-    var jdaBuilder: JDABuilder? = null
+    private val jdaBuilder: JDABuilder
+    lateinit var jda: JDA
 
     init {
         val clientOptions = ClientOptions().apply(options)
@@ -17,7 +19,7 @@ class Client(options: ClientOptions.() -> Unit) {
     }
 
     inline fun <reified Event : GenericEvent> on(crossinline callback: (event: Event) -> Unit) {
-        jdaBuilder?.addEventListeners(object : ListenerAdapter() {
+        jda.addEventListener(object : ListenerAdapter() {
             override fun onGenericEvent(event: GenericEvent) {
                 if (event !is Event) return
 
@@ -27,17 +29,20 @@ class Client(options: ClientOptions.() -> Unit) {
     }
 
     inline fun <reified Event : GenericEvent> once(crossinline callback: (event: Event) -> Unit) {
-        jdaBuilder?.addEventListeners(object : ListenerAdapter() {
+        jda.addEventListener(object : ListenerAdapter() {
             override fun onGenericEvent(event: GenericEvent) {
                 if (event !is Event) return
 
                 callback(event)
-                jdaBuilder?.removeEventListeners(this)
+                jda.removeEventListener(this)
             }
         })
     }
 
     fun login(token: String) {
-        jdaBuilder?.setToken(token)?.build()
+        jda = jdaBuilder
+            .setToken(token)
+            .build()
+            .awaitReady()
     }
 }
