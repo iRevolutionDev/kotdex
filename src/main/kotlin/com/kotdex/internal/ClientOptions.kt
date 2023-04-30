@@ -1,5 +1,6 @@
 package com.kotdex.internal
 
+import com.kotdex.lib.theme.Theme
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.ChunkingFilter
 import net.dv8tion.jda.api.utils.MemberCachePolicy
@@ -19,5 +20,9 @@ data class ClientOptions(
     var caches: List<CacheFlag> = listOf()
     fun caches(block: List<CacheFlag>.() -> Unit) {
         caches.apply(block)
+    }
+
+    fun theme(block: Theme.() -> Unit) {
+        Theme.apply(block)
     }
 }
