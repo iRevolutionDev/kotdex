@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 
 data class ClientOptions(
-    var prefix: String = "!",
     var chunkingFilter: ChunkingFilter = ChunkingFilter.NONE,
     var largeThreshold: Int = 250,
     var policy: MemberCachePolicy = MemberCachePolicy.DEFAULT
@@ -24,5 +23,10 @@ data class ClientOptions(
 
     fun theme(block: Theme.() -> Unit) {
         Theme.apply(block)
+    }
+
+    var commandOptions: CommandOptions = CommandOptions()
+    fun commandOptions(block: CommandOptions.() -> Unit) {
+        commandOptions.apply(block)
     }
 }
