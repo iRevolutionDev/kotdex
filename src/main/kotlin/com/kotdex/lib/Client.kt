@@ -54,7 +54,9 @@ class Client(options: ClientOptions.() -> Unit) {
 
     private fun parseCommand(prefix: String, message: Message): Pair<(message: Message) -> Unit, SimpleCommandResult> {
         val content = message.contentRaw
-        val command = content.replace(Regex("^$prefix"), "").split(" ")[0]
+        val command = content.removePrefix(prefix).split(" ")[0]
+
+        if (!content.startsWith(prefix)) return Pair({}, SimpleCommandResult.INVALID_PREFIX)
 
         if (command.isEmpty()) {
             return Pair({}, SimpleCommandResult.NOT_COMMAND)
