@@ -1,34 +1,44 @@
 package com.kotdex.internal.reflection.handlers
 
 import com.kotdex.annotations.SimpleCommand
-import com.kotdex.internal.Tuple
-import com.kotdex.internal.reflection.ReflectionUtils
-import java.lang.reflect.Method
+import com.kotdex.internal.proxies.SLF4J
+import net.dv8tion.jda.api.entities.Message
 
 object SimpleCommandHandler {
-    fun getCommandByName(name: String): SimpleCommand? {
-        ReflectionUtils.discordClasses.forEach { discordClass ->
-            discordClass.declaredMethods.forEach { method ->
-                val simpleCommand = method.getAnnotation(SimpleCommand::class.java) ?: return null
+    private val commands = mutableMapOf<String, Pair<SimpleCommand, (message: Message) -> Unit>>()
 
-                if (simpleCommand.name == name) return simpleCommand
-            }
+    private val logger by SLF4J
+
+    fun registerCommand(obj: Class<*>) {
+        val methods = obj.declaredMethods.filter {
+            it.isAnnotationPresent(SimpleCommand::class.java)
         }
-        return null
+
+        methods.forEach { method ->
+            val annotation = method.getAnnotation(SimpleCommand::class.java)
+            val name = annotation.name
+
+            if (commands.containsKey(name)) {
+                throw IllegalArgumentException("Command with name $name already exists")
+            }
+
+            commands[name] = Pair(annotation) { message: Message ->
+                method.invoke(obj.getConstructor().newInstance(), message)
+            }
+
+            logger.info("Registered command $name")
+        }
     }
 
-    fun getCommandMethodByName(name: String): Tuple<out Method?, out Any?> {
-        ReflectionUtils.discordClasses.forEach { discordClass ->
-            discordClass.declaredMethods.forEach { method ->
-                val simpleCommand = method.getAnnotation(SimpleCommand::class.java) ?: return Tuple(method, null)
-
-                if (simpleCommand.name == name) return Tuple(method, discordClass.getConstructor().newInstance())
-            }
-        }
-        return Tuple(null, null)
+    fun exists(name: String): Boolean {
+        return commands.containsKey(name)
     }
 
-    fun commandExists(name: String): Boolean {
-        return getCommandByName(name) != null
+    fun getCommand(name: String): Pair<SimpleCommand, (message: Message) -> Unit> {
+        return commands[name] ?: throw IllegalArgumentException("Command with name $name does not exist")
+    }
+
+    fun getCommands(): Map<String, Pair<SimpleCommand, (message: Message) -> Unit>> {
+        return commands
     }
 }

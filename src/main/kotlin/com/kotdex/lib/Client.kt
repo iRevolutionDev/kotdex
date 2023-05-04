@@ -1,7 +1,6 @@
 package com.kotdex.lib
 
 import com.kotdex.internal.ClientOptions
-import com.kotdex.internal.proxies.SLF4J
 import com.kotdex.internal.reflection.handlers.SimpleCommandHandler
 import com.kotdex.lib.commands.SimpleCommandResult
 import net.dv8tion.jda.api.JDA
@@ -53,39 +52,45 @@ class Client(options: ClientOptions.() -> Unit) {
         TODO()
     }
 
-    fun parseCommand(prefix: String, message: Message): SimpleCommandResult {
-        val prefixRegex = Regex("^$prefix")
+    private fun parseCommand(prefix: String, message: Message): Pair<(message: Message) -> Unit, SimpleCommandResult> {
         val content = message.contentRaw
+        val command = content.replace(Regex("^$prefix"), "").split(" ")[0]
 
-        val isCommand = prefixRegex.containsMatchIn(content)
-        if (!isCommand) return SimpleCommandResult.NOT_COMMAND
+        if (command.isEmpty()) {
+            return Pair({}, SimpleCommandResult.NOT_COMMAND)
+        }
 
-        val command = content.replace(prefixRegex, "").split(" ")[0]
+        if (!SimpleCommandHandler.exists(command)) {
+            return Pair({}, SimpleCommandResult.NOT_FOUND)
+        }
 
-        if (command.isEmpty()) return SimpleCommandResult.NOT_COMMAND
+        val commandPair = SimpleCommandHandler.getCommand(command)
+        val commandMethod = commandPair.second
 
-        return if (SimpleCommandHandler.commandExists(command)) SimpleCommandResult.SUCCESS else SimpleCommandResult.NOT_FOUND
+        return Pair(commandMethod, SimpleCommandResult.SUCCESS)
     }
 
     fun executeCommand(message: Message) {
-        val logger by SLF4J
+        val prefix = clientOptions.commandOptions.prefix
+        val (commandMethod, result) = parseCommand(prefix, message)
 
-        val command = parseCommand(clientOptions.commandOptions.prefix, message)
-        if (command == SimpleCommandResult.NOT_COMMAND) return
+        if (message.author.isBot) return
 
-        if (command == SimpleCommandResult.NOT_FOUND) {
-            message.channel.sendMessage(clientOptions.commandOptions.notFoundMessage).queue()
+        if (result == SimpleCommandResult.NOT_COMMAND) {
+            message.reply("Not a command").queue()
+            return
         }
 
-        val commandName = message.contentRaw.replace(Regex("^${clientOptions.commandOptions.prefix}"), "").split(" ")[0]
-
-        val simpleCommand = SimpleCommandHandler.getCommandMethodByName(commandName)
+        if (result == SimpleCommandResult.NOT_FOUND) {
+            message.reply(clientOptions.commandOptions.notFoundMessage).queue()
+            return
+        }
 
         try {
-            simpleCommand.a?.invoke(simpleCommand.b, message)
+            commandMethod(message)
         } catch (e: Exception) {
-            logger.error(e.message)
-            message.channel.sendMessage("An error occurred while executing the command.").queue()
+            message.reply("An error occurred while executing the command").queue()
+            e.printStackTrace()
         }
     }
 
