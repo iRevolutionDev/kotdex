@@ -31,11 +31,11 @@ object SimpleCommandHandler {
     }
 
     fun exists(name: String): Boolean {
-        return commands.containsKey(name)
+        return commands.containsKey(name) || commands.filter { it.value.first.aliases.contains(name) }.isNotEmpty()
     }
 
     fun getCommand(name: String): Pair<SimpleCommand, (message: Message) -> Unit> {
-        return commands[name] ?: throw IllegalArgumentException("Command with name $name does not exist")
+        return commands[name] ?: commands.filter { it.value.first.aliases.contains(name) }.values.first()
     }
 
     fun getCommands(): Map<String, Pair<SimpleCommand, (message: Message) -> Unit>> {
