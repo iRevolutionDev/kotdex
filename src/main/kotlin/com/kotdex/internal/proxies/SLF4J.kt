@@ -2,9 +2,10 @@ package com.kotdex.internal.proxies
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory.getLogger
+import kotlin.reflect.KProperty
 
 object SLF4J {
-    operator fun getValue(thisRef: Any?, property: Any?): Logger {
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): Logger {
         return getLogger(thisRef!!::class.java)!!
     }
 
@@ -16,7 +17,7 @@ object SLF4J {
         getLogger(name)!!
     }
 
-    inline operator fun <reified T> invoke(): Logger {
-        return getLogger(T::class.java)
+    inline operator fun <reified T> invoke() = lazy {
+        getLogger(T::class.java)!!
     }
 }
