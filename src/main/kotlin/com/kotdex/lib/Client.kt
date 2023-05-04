@@ -1,6 +1,7 @@
 package com.kotdex.lib
 
 import com.kotdex.internal.ClientOptions
+import com.kotdex.internal.proxies.SLF4J
 import com.kotdex.internal.reflection.handlers.SimpleCommandHandler
 import com.kotdex.lib.commands.SimpleCommandResult
 import net.dv8tion.jda.api.JDA
@@ -14,6 +15,8 @@ class Client(options: ClientOptions.() -> Unit) {
     private val jdaBuilder: JDABuilder
     private var clientOptions: ClientOptions
     lateinit var jda: JDA
+
+    private val logger by SLF4J
 
     init {
         clientOptions = ClientOptions().apply(options)
@@ -95,9 +98,12 @@ class Client(options: ClientOptions.() -> Unit) {
         try {
             commandMethod(message, args)
         } catch (e: Exception) {
+            logger.error("An error occurred while executing the command", e)
+
+            if (!clientOptions.commandOptions.showErrors) return
             message.reply("An error occurred while executing the command").queue()
-            message.reply(e.message ?: "No error message").queue()
-            e.printStackTrace()
+            message.reply("```${e.message ?: "No message provided"}: ${e.cause?.message ?: "No cause provided"}```")
+                .queue()
         }
     }
 
