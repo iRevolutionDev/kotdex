@@ -5,7 +5,7 @@ import com.kotdex.internal.proxies.SLF4J
 import net.dv8tion.jda.api.entities.Message
 
 object SimpleCommandHandler {
-    private val commands = mutableMapOf<String, Pair<SimpleCommand, (message: Message) -> Unit>>()
+    private val commands = mutableMapOf<String, Pair<SimpleCommand, (Message, List<String>) -> Unit>>()
 
     private val logger by SLF4J
 
@@ -22,8 +22,8 @@ object SimpleCommandHandler {
                 throw IllegalArgumentException("Command with name $name already exists")
             }
 
-            commands[name] = Pair(annotation) { message: Message ->
-                method.invoke(obj.getConstructor().newInstance(), message)
+            commands[name] = Pair(annotation) { message, args ->
+                method.invoke(obj.getConstructor().newInstance(), message, args)
             }
 
             logger.info("Registered command $name")
@@ -34,11 +34,11 @@ object SimpleCommandHandler {
         return commands.containsKey(name) || commands.filter { it.value.first.aliases.contains(name) }.isNotEmpty()
     }
 
-    fun getCommand(name: String): Pair<SimpleCommand, (message: Message) -> Unit> {
+    fun getCommand(name: String): Pair<SimpleCommand, (Message, List<String>) -> Unit> {
         return commands[name] ?: commands.filter { it.value.first.aliases.contains(name) }.values.first()
     }
 
-    fun getCommands(): Map<String, Pair<SimpleCommand, (message: Message) -> Unit>> {
+    fun getCommands(): Map<String, Pair<SimpleCommand, (Message, List<String>) -> Unit>> {
         return commands
     }
 }

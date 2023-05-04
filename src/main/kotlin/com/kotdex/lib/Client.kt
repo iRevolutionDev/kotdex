@@ -52,18 +52,21 @@ class Client(options: ClientOptions.() -> Unit) {
         TODO()
     }
 
-    private fun parseCommand(prefix: String, message: Message): Pair<(message: Message) -> Unit, SimpleCommandResult> {
+    private fun parseCommand(
+        prefix: String,
+        message: Message
+    ): Pair<(Message, List<String>) -> Unit, SimpleCommandResult> {
         val content = message.contentRaw
         val command = content.removePrefix(prefix).split(" ")[0]
 
-        if (!content.startsWith(prefix)) return Pair({}, SimpleCommandResult.INVALID_PREFIX)
+        if (!content.startsWith(prefix)) return Pair({ _, _ -> }, SimpleCommandResult.INVALID_PREFIX)
 
         if (command.isEmpty()) {
-            return Pair({}, SimpleCommandResult.NOT_COMMAND)
+            return Pair({ _, _ -> }, SimpleCommandResult.NOT_COMMAND)
         }
 
         if (!SimpleCommandHandler.exists(command)) {
-            return Pair({}, SimpleCommandResult.NOT_FOUND)
+            return Pair({ _, _ -> }, SimpleCommandResult.NOT_FOUND)
         }
 
         val commandPair = SimpleCommandHandler.getCommand(command)
@@ -75,6 +78,7 @@ class Client(options: ClientOptions.() -> Unit) {
     fun executeCommand(message: Message) {
         val prefix = clientOptions.commandOptions.prefix
         val (commandMethod, result) = parseCommand(prefix, message)
+        val args = message.contentRaw.removePrefix(prefix).split(" ").drop(1)
 
         if (message.author.isBot) return
 
@@ -89,9 +93,10 @@ class Client(options: ClientOptions.() -> Unit) {
         }
 
         try {
-            commandMethod(message)
+            commandMethod(message, args)
         } catch (e: Exception) {
             message.reply("An error occurred while executing the command").queue()
+            message.reply(e.message ?: "No error message").queue()
             e.printStackTrace()
         }
     }
