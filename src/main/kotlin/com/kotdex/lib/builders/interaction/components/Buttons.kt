@@ -14,22 +14,22 @@ fun button(
     return Button.of(style, id, label, emoji).withDisabled(disabled)
 }
 
-fun primary(id: String, label: String?, emoji: Emoji?): Button {
+fun primary(id: String, label: String, emoji: Emoji? = null): Button {
     return button(id, label, emoji, ButtonStyle.PRIMARY)
 }
 
-fun secondary(id: String, label: String?, emoji: Emoji?): Button {
+fun secondary(id: String, label: String, emoji: Emoji? = null): Button {
     return button(id, label, emoji, ButtonStyle.SECONDARY)
 }
 
-fun success(id: String, label: String?, emoji: Emoji?): Button {
+fun success(id: String, label: String, emoji: Emoji? = null): Button {
     return button(id, label, emoji, ButtonStyle.SUCCESS)
 }
 
-fun danger(id: String, label: String?, emoji: Emoji?): Button {
+fun danger(id: String, label: String, emoji: Emoji? = null): Button {
     return button(id, label, emoji, ButtonStyle.DANGER)
 }
 
-fun link(url: String, label: String?, emoji: Emoji?): Button {
+fun link(url: String, label: String, emoji: Emoji? = null): Button {
     return button(url, label, emoji, ButtonStyle.LINK)
 }
