@@ -1,5 +1,5 @@
 package com.kotdex.lib.builders
 
-interface IBuilder<R> {
+interface IBuilder<out R> {
     fun build(): R
 }
