@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle
 fun button(
     id: String,
     label: String?,
-    emoji: Emoji?,
+    emoji: Emoji? = null,
     style: ButtonStyle = ButtonStyle.SECONDARY,
     disabled: Boolean = false
 ): Button {
