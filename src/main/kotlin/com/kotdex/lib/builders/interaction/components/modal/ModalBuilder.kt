@@ -7,12 +7,17 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 import net.dv8tion.jda.api.interactions.modals.Modal
 
+@DslMarker
+annotation class ModalDslBuilder
+
 /**
  * A builder used to create a [Modal] object.
  *
  * @property customId the unique identifier for the modal.
  * @property label the title of the modal.
  */
+
+@ModalDslBuilder
 class ModalBuilder(
     var customId: String,
     var label: String
@@ -103,4 +108,10 @@ fun modal(
     block: ModalBuilder.() -> Unit
 ): Modal {
     return ModalBuilder(customId, label).apply(block).build()
+}
+
+val modal = modal("a", "tem nao") {
+    textinput("a", "b", TextInputStyle.PARAGRAPH) {
+
+    }
 }

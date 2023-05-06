@@ -4,12 +4,16 @@ import com.kotdex.lib.builders.IBuilder
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu.SelectTarget
 
+@DslMarker
+annotation class EntitySelectMenuDslMarker
+
 /**
  * A builder for creating [EntitySelectMenu]s.
  *
  * @property customId The custom ID to use for the menu.
  * @property type The select target to use for the menu.
  */
+@EntitySelectMenuDslMarker
 class EntitySelectMenuBuilder(
     private val customId: String,
     private val type: SelectTarget

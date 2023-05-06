@@ -5,11 +5,15 @@ import net.dv8tion.jda.api.entities.emoji.Emoji
 import net.dv8tion.jda.api.interactions.components.selections.SelectOption
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu
 
+@DslMarker
+annotation class StringSelectMenuDslMarker
+
 /**
  * Builder for creating a [StringSelectMenu] component for use in a Discord bot application.
  *
  * @param customId The custom ID for the select menu.
  */
+@StringSelectMenuDslMarker
 class StringSelectMenuBuilder(private val customId: String = "") : IBuilder<StringSelectMenu> {
     var placeholder: String? = null
     var requiredRange: IntRange = 1..1
@@ -97,7 +101,6 @@ class StringSelectMenuBuilder(private val customId: String = "") : IBuilder<Stri
             .setDefaultValues(defaultValue)
             .build()
     }
-
 }
 
 /**

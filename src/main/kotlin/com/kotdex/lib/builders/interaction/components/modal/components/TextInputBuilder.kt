@@ -4,6 +4,10 @@ import com.kotdex.lib.builders.IBuilder
 import net.dv8tion.jda.api.interactions.components.text.TextInput
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
 
+
+@DslMarker
+annotation class TextInputDslMarker
+
 /**
  * A builder for creating text input fields.
  *
@@ -11,6 +15,7 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle
  * @property label a label to display alongside the text input field
  * @property style the style of the text input field
  */
+@TextInputDslMarker
 open class TextInputBuilder(
     protected val customId: String,
     protected val label: String,
